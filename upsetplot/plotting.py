@@ -10,6 +10,8 @@ from matplotlib import pyplot as plt
 from . import util
 from .reformat import _get_subset_mask, query
 
+from .alt_text import generate_grammar
+
 # prevents ImportError on matplotlib versions >3.5.2
 try:
     from matplotlib.tight_layout import get_renderer
@@ -360,6 +362,25 @@ class UpSet:
         ]
         self.subset_legend = []  # pairs of (style, label)
 
+        self.grammar = generate_grammar(
+            self._df,
+            self.intersections,
+            self.totals,
+            sort_by=sort_by,
+            sort_categories_by=sort_categories_by,
+            # these attributes are not present in UpSet 2
+            # subset_size=subset_size,
+            # sum_over=sum_over,
+            # min_subset_size=min_subset_size,
+            # max_subset_size=max_subset_size,
+            # max_subset_rank=max_subset_rank,
+            min_degree=min_degree,
+            max_degree=max_degree,
+            # this attribute is not present in UpSet 2
+            # reverse=not self._horizontal,
+            include_empty_subsets=include_empty_subsets,
+        )
+
     def _swapaxes(self, x, y):
         if self._horizontal:
             return x, y
@@ -632,6 +653,9 @@ class UpSet:
                 "kw": kw,
             }
         )
+
+        # add the category to the list of visible categories
+        self.grammar['visibleAttributes'].append(value)
 
     def _check_value(self, value):
         if value is None and "_value" in self._df.columns:
