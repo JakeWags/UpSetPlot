@@ -130,6 +130,7 @@ Installation requires:
 * pandas
 * matplotlib >= 2.0
 * seaborn to use `UpSet.add_catplot`
+* upset-alttxt v0.2.7 to use `UpSet.get_alt_text`
 
 It should then be possible to::
 
