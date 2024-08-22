@@ -10,3 +10,4 @@ scikit-learn
 nbsphinx
 sphinx<2
 sphinx-rtd-theme
+upset-alttxt==0.2.7
