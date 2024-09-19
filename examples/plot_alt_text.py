@@ -27,6 +27,7 @@ upset = UpSet(
     sort_categories_by="-cardinality",
     orientation="vertical",
     gen_grammar=True,
+    meta_data={"items": "RANDOM ITEMS"},
 )
 upset.plot()
 plt.suptitle("UpSet plot with text description generated'")

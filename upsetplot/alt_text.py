@@ -1,4 +1,3 @@
-import json
 from alttxt.enums import Level
 from alttxt.generator import AltTxtGen
 from alttxt.tokenmap import TokenMap
@@ -26,6 +25,7 @@ def generate_grammar(
     max_degree=None,
     include_empty_subsets=False,
     include_data=False,
+    meta_data=None,
 ):
     """
     Generate the grammar used by UpSet 2 and Multinet to generate alt text.
@@ -64,7 +64,13 @@ def generate_grammar(
 
     # default grammar state values required by UpSet 2/Multinet
     grammar = {
-        "plotInformation": {"description": "", "sets": "", "items": ""},
+        "plotInformation": {
+            "title": "",
+            "caption": "",
+            "description": "",
+            "sets": "",
+            "items": ""
+        },
         "horizontal": False,
         "firstAggregateBy": "None",
         "firstOverlapDegree": 2,
@@ -87,6 +93,13 @@ def generate_grammar(
     }
 
     grammar["horizontal"] = horizontal
+
+    if meta_data is not None:
+        grammar["plotInformation"]["title"] = meta_data.get("title", "")
+        grammar["plotInformation"]["caption"] = meta_data.get("caption", "")
+        grammar["plotInformation"]["description"] = meta_data.get("description", "")
+        grammar["plotInformation"]["sets"] = meta_data.get("sets", "")
+        grammar["plotInformation"]["items"] = meta_data.get("items", "")
 
     if sort_by == "degree":
         grammar["sortBy"] = "Degree"

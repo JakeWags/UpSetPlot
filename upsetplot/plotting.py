@@ -311,6 +311,7 @@ class UpSet:
         show_percentages=False,
         include_empty_subsets=False,
         gen_grammar=False,
+        meta_data=None,
     ):
         self._horizontal = orientation == "horizontal"
         self._reorient = _identity if self._horizontal else _transpose
@@ -380,6 +381,7 @@ class UpSet:
                     max_degree=max_degree,
                     include_empty_subsets=include_empty_subsets,
                     include_data=True,
+                    meta_data=meta_data,
             )
 
     def get_alt_text(self):
