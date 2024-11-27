@@ -10,6 +10,8 @@ from matplotlib import pyplot as plt
 from . import util
 from .reformat import _get_subset_mask, query
 
+from .alt_text import fetch_alt_text, generate_grammar
+
 # prevents ImportError on matplotlib versions >3.5.2
 try:
     from matplotlib.tight_layout import get_renderer
@@ -278,6 +280,8 @@ class UpSet:
     include_empty_subsets : bool (default=False)
         If True, all possible category combinations will be shown as subsets,
         even when some are not present in data.
+    gen_grammar : bool (default=False)
+        If True, a grammar will be generated for the plot.
     """
 
     _default_figsize = (10, 6)
@@ -306,6 +310,8 @@ class UpSet:
         show_counts="",
         show_percentages=False,
         include_empty_subsets=False,
+        gen_grammar=False,
+        meta_data=None,
     ):
         self._horizontal = orientation == "horizontal"
         self._reorient = _identity if self._horizontal else _transpose
@@ -340,25 +346,64 @@ class UpSet:
         self._show_counts = show_counts
         self._show_percentages = show_percentages
 
-        (self.total, self._df, self.intersections, self.totals) = _process_data(
-            data,
-            sort_by=sort_by,
-            sort_categories_by=sort_categories_by,
-            subset_size=subset_size,
-            sum_over=sum_over,
-            min_subset_size=min_subset_size,
-            max_subset_size=max_subset_size,
-            max_subset_rank=max_subset_rank,
-            min_degree=min_degree,
-            max_degree=max_degree,
-            reverse=not self._horizontal,
-            include_empty_subsets=include_empty_subsets,
+        (self.total, self._df, self.intersections, self.totals) = (
+            _process_data(
+                data,
+                sort_by=sort_by,
+                sort_categories_by=sort_categories_by,
+                subset_size=subset_size,
+                sum_over=sum_over,
+                min_subset_size=min_subset_size,
+                max_subset_size=max_subset_size,
+                max_subset_rank=max_subset_rank,
+                min_degree=min_degree,
+                max_degree=max_degree,
+                reverse=not self._horizontal,
+                include_empty_subsets=include_empty_subsets,
+            )
         )
         self.category_styles = {}
         self.subset_styles = [
             {"facecolor": facecolor} for i in range(len(self.intersections))
         ]
         self.subset_legend = []  # pairs of (style, label)
+        self._grammar = None
+
+        if (gen_grammar):
+            self._grammar = generate_grammar(
+                    self._df,
+                    self.intersections,
+                    self.totals,
+                    horizontal=self._horizontal,
+                    sort_by=sort_by,
+                    sort_categories_by=sort_categories_by,
+                    min_degree=min_degree,
+                    max_degree=max_degree,
+                    include_empty_subsets=include_empty_subsets,
+                    include_data=True,
+                    meta_data=meta_data,
+            )
+
+    def get_alt_text(self):
+        """Return a textual description of the plot from upset-alttxt
+
+        Returns
+        -------
+        dict
+            A json object with textual descriptions of the plot.
+            Contains entries:
+                'techniqueDescription' (str),
+                'shortDescription' (str)
+                'longDescription' (str): a markdown formatted string
+        """
+        if (self._grammar is None):
+            raise ValueError("Grammar not generated.")
+
+        try:
+            return fetch_alt_text(self._grammar)
+        except Exception as e:
+            warnings.warn("Failed to fetch alt text: %s" % e)
+            return {}
 
     def _swapaxes(self, x, y):
         if self._horizontal:
@@ -632,6 +677,12 @@ class UpSet:
                 "kw": kw,
             }
         )
+
+        # add the category to the grammar (list of visible categories)
+        if self._grammar is not None:
+            self._grammar['visibleAttributes'].append(value)
+
+        # attribute stats data needs to be added to every subset
 
     def _check_value(self, value):
         if value is None and "_value" in self._df.columns:
@@ -935,6 +986,39 @@ class UpSet:
                 )
         else:
             raise NotImplementedError("unhandled where: %r" % where)
+
+    def get_grammar(self):
+        """Return the grammar dictionary for the plot.
+
+        Returns:
+            dict: The grammar dictionary for the plot.
+        """
+        return self._grammar
+
+    def _update_grammar(self, key, value):
+        """
+        Update the grammar dictionary with the given key-value pair.
+
+        If the key already exists in the grammar, the value is appended to the existing list.
+        If the key does not exist, a ValueError is raised.
+
+        Args:
+            key (str): The key to update in the grammar dictionary.
+            value (Any): The value to append to the existing list or assign to the key.
+
+        Raises:
+            ValueError: If the key is not found in the grammar dictionary.
+        """
+        if self._grammar is None:
+            return
+        if key in self._grammar:
+            if isinstance(self.grammar[key], list):
+                self.grammar[key].append(value)
+            else:
+                self.grammar[key] = value
+            return True
+        else:
+            raise ValueError(f"Key {key} not found in grammar")
 
     def plot_totals(self, ax):
         """Plot bars indicating total set size"""
