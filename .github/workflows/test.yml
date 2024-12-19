@@ -20,6 +20,7 @@ jobs:
         shell: bash -el {0}
         run: |
           conda install pytest pytest-cov coveralls ${{ matrix.conda-deps }}
+          pip install upset-alttxt==0.5.2
           python setup.py install
           cp ci/matplotlibrc matplotlibrc
       - name: test

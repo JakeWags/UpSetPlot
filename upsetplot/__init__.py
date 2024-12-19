@@ -3,6 +3,10 @@ __version__ = "0.10dev1"
 import os
 
 if os.environ.get("__IN-SETUP", None) != "1":
+    from .alt_text import (
+        fetch_alt_text,
+        generate_grammar,
+    )
     from .data import (
         from_contents,
         from_indicators,
@@ -24,4 +28,6 @@ if os.environ.get("__IN-SETUP", None) != "1":
         "from_contents",
         "from_indicators",
         "query",
+        "generate_grammar",
+        "fetch_alt_text",
     ]

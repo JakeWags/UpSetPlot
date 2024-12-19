@@ -14,6 +14,7 @@ exa_glob = os.path.join(
 def test_example(path):
     pytest.importorskip("sklearn")
     pytest.importorskip("seaborn")
+    pytest.importorskip("upset-alttxt")
     env = os.environ.copy()
     env["PYTHONPATH"] = os.getcwd() + ":" + env.get("PYTHONPATH", "")
     subprocess.check_output([sys.executable, path], env=env)
