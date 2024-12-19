@@ -385,7 +385,7 @@ class UpSet:
             )
 
     def get_alt_text(self):
-        """Return a textual description of the plot from upset-alttxt
+        """Return a textual description of the plot from upset-alttxt package
 
         Returns
         -------

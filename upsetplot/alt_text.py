@@ -64,6 +64,7 @@ def generate_grammar(
 
     # default grammar state values required by UpSet 2/Multinet
     grammar = {
+        "version": "0.1.0",  # alt-text grammar version
         "plotInformation": {
             "title": "",
             "caption": "",
@@ -86,7 +87,7 @@ def generate_grammar(
         },
         "visibleSets": [],
         "visibleAttributes": [],
-        "bookmarkedIntersections": [],
+        "bookmarks": [],
         "collapsed": [],
         "plots": {"scatterplots": [], "histograms": [], "wordClouds": []},
         "allSets": [],
@@ -216,7 +217,7 @@ def calculate_deviation(
             set_size = sets[v]
             non_contained_product *= 1 - set_size / total_items
 
-    dev = intersection_size / total_items - contained_product * non_contained_product
+    dev = (intersection_size / total_items) - (contained_product * non_contained_product)
 
     return dev * 100
 
@@ -306,7 +307,7 @@ def generate_intersection_id(intersections, idx):
     intersection_id = "Subset"
     set_membership = get_set_membership_from_index(intersections, idx)
     for name in names:
-        # the delimiter "~_~" is used here as it is unlikely that it will be used in a set name
+        # the delimiter "~_~" is used in UpSet2 in the internal ID
         intersection_id += f"~_~{name}" if set_membership[name] == "Yes" else ""
 
     # the empty subset is named "Subset_Unincluded" in UpSet2
@@ -361,11 +362,18 @@ def fetch_alt_text(grammar):
     Returns:
         The alt text for the plot.
     """
-    parser = Parser(grammar)
-    parsed_data = parser.get_data()
-    parsed_grammar = parser.get_grammar()
+    try:
+        parser = Parser(grammar)
+        parsed_data = parser.get_data()
+        parsed_grammar = parser.get_grammar()
 
-    tokenmap: TokenMap = TokenMap(parsed_data, parsed_grammar, 'title')
-    gen = AltTxtGen(Level.DEFAULT, True, tokenmap, parsed_grammar)
+        tokenmap: TokenMap = TokenMap(parsed_data, parsed_grammar, 'title')
 
-    return gen.text
+        gen = AltTxtGen(Level.DEFAULT, True, tokenmap, parsed_grammar)
+    except Exception as e:
+        raise Exception(f"Failed to create alt text generator: {e}")
+
+    try:
+        return gen.text
+    except Exception as e:
+        raise Exception(f"Failed to generate alt text: {e}")
