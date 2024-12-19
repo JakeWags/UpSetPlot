@@ -13,6 +13,10 @@ if os.environ.get("__IN-SETUP", None) != "1":
     )
     from .plotting import UpSet, plot
     from .reformat import query
+    from .alt_text import (
+        generate_grammar,
+        fetch_alt_text,
+    )
 
     __all__ = [
         "UpSet",
@@ -24,4 +28,6 @@ if os.environ.get("__IN-SETUP", None) != "1":
         "from_contents",
         "from_indicators",
         "query",
+        "generate_grammar",
+        "fetch_alt_text",
     ]
