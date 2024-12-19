@@ -6,8 +6,8 @@ jobs:
     strategy:
       matrix:
         conda-deps:
-          - python=3.8 pandas=1.0 matplotlib=3.1.2 numpy=1.17 upset-alttxt=0.4.9
-          - pandas matplotlib numpy upset-alttxt
+          - python=3.8 pandas=1.0 matplotlib=3.1.2 numpy=1.17
+          - pandas matplotlib numpy
     steps:
       - uses: actions/checkout@v4
       - uses: conda-incubator/setup-miniconda@v3
@@ -20,6 +20,7 @@ jobs:
         shell: bash -el {0}
         run: |
           conda install pytest pytest-cov coveralls ${{ matrix.conda-deps }}
+          pip install upset-alttxt==0.4.9
           python setup.py install
           cp ci/matplotlibrc matplotlibrc
       - name: test
