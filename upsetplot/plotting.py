@@ -8,9 +8,8 @@ from matplotlib import colors, patches
 from matplotlib import pyplot as plt
 
 from . import util
-from .reformat import _get_subset_mask, query
-
 from .alt_text import fetch_alt_text, generate_grammar
+from .reformat import _get_subset_mask, query
 
 # prevents ImportError on matplotlib versions >3.5.2
 try:
@@ -346,21 +345,19 @@ class UpSet:
         self._show_counts = show_counts
         self._show_percentages = show_percentages
 
-        (self.total, self._df, self.intersections, self.totals) = (
-            _process_data(
-                data,
-                sort_by=sort_by,
-                sort_categories_by=sort_categories_by,
-                subset_size=subset_size,
-                sum_over=sum_over,
-                min_subset_size=min_subset_size,
-                max_subset_size=max_subset_size,
-                max_subset_rank=max_subset_rank,
-                min_degree=min_degree,
-                max_degree=max_degree,
-                reverse=not self._horizontal,
-                include_empty_subsets=include_empty_subsets,
-            )
+        (self.total, self._df, self.intersections, self.totals) = _process_data(
+            data,
+            sort_by=sort_by,
+            sort_categories_by=sort_categories_by,
+            subset_size=subset_size,
+            sum_over=sum_over,
+            min_subset_size=min_subset_size,
+            max_subset_size=max_subset_size,
+            max_subset_rank=max_subset_rank,
+            min_degree=min_degree,
+            max_degree=max_degree,
+            reverse=not self._horizontal,
+            include_empty_subsets=include_empty_subsets,
         )
         self.category_styles = {}
         self.subset_styles = [
@@ -369,19 +366,19 @@ class UpSet:
         self.subset_legend = []  # pairs of (style, label)
         self._grammar = None
 
-        if (gen_grammar):
+        if gen_grammar:
             self._grammar = generate_grammar(
-                    self._df,
-                    self.intersections,
-                    self.totals,
-                    horizontal=self._horizontal,
-                    sort_by=sort_by,
-                    sort_categories_by=sort_categories_by,
-                    min_degree=min_degree,
-                    max_degree=max_degree,
-                    include_empty_subsets=include_empty_subsets,
-                    include_data=True,
-                    meta_data=meta_data,
+                self._df,
+                self.intersections,
+                self.totals,
+                horizontal=self._horizontal,
+                sort_by=sort_by,
+                sort_categories_by=sort_categories_by,
+                min_degree=min_degree,
+                max_degree=max_degree,
+                include_empty_subsets=include_empty_subsets,
+                include_data=True,
+                meta_data=meta_data,
             )
 
     def get_alt_text(self):
@@ -396,7 +393,7 @@ class UpSet:
                 'shortDescription' (str)
                 'longDescription' (str): a markdown formatted string
         """
-        if (self._grammar is None):
+        if self._grammar is None:
             raise ValueError("Grammar not generated.")
 
         try:
@@ -680,7 +677,7 @@ class UpSet:
 
         # add the category to the grammar (list of visible categories)
         if self._grammar is not None:
-            self._grammar['visibleAttributes'].append(value)
+            self._grammar["visibleAttributes"].append(value)
 
         # attribute stats data needs to be added to every subset
 

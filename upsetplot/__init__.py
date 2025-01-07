@@ -3,6 +3,10 @@ __version__ = "0.10dev1"
 import os
 
 if os.environ.get("__IN-SETUP", None) != "1":
+    from .alt_text import (
+        fetch_alt_text,
+        generate_grammar,
+    )
     from .data import (
         from_contents,
         from_indicators,
@@ -13,10 +17,6 @@ if os.environ.get("__IN-SETUP", None) != "1":
     )
     from .plotting import UpSet, plot
     from .reformat import query
-    from .alt_text import (
-        generate_grammar,
-        fetch_alt_text,
-    )
 
     __all__ = [
         "UpSet",

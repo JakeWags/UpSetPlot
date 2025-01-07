@@ -1,8 +1,7 @@
 from alttxt.enums import Level
 from alttxt.generator import AltTxtGen
-from alttxt.tokenmap import TokenMap
 from alttxt.parser import Parser
-
+from alttxt.tokenmap import TokenMap
 
 """
     alt_text.py
@@ -70,7 +69,7 @@ def generate_grammar(
             "caption": "",
             "description": "",
             "sets": "",
-            "items": ""
+            "items": "",
         },
         "horizontal": False,
         "firstAggregateBy": "None",
@@ -133,12 +132,8 @@ def generate_grammar(
         min_degree > 0 if min_degree is not None else False
     )
 
-    grammar["filters"]["minVisible"] = (
-        min_degree if min_degree is not None else 0
-    )
-    grammar["filters"]["maxVisible"] = (
-        max_degree if max_degree is not None else 6
-    )
+    grammar["filters"]["minVisible"] = min_degree if min_degree is not None else 0
+    grammar["filters"]["maxVisible"] = max_degree if max_degree is not None else 6
 
     grammar["visibleSets"] = totals.index.to_list()
 
@@ -148,10 +143,8 @@ def generate_grammar(
         # generate intersection ids, or simply append index?
     ]
 
-    if (include_data):
-        grammar["processedData"] = generate_processed_data(
-            df, intersections, totals
-        )
+    if include_data:
+        grammar["processedData"] = generate_processed_data(df, intersections, totals)
         grammar["rawData"] = {}
         grammar["accessibleProcessedData"] = generate_processed_data(
             df, intersections, totals, accessible=True
@@ -180,13 +173,7 @@ def get_all_sets_info(totals):
     return all_sets
 
 
-def calculate_deviation(
-    contained_sets,
-    v_sets,
-    sets,
-    intersection_size,
-    total_items
-):
+def calculate_deviation(contained_sets, v_sets, sets, intersection_size, total_items):
     """
     Calculate the deviation of a given intersection.
     Based on deviation calculation in 2014 paper by Lex et al.
@@ -217,7 +204,9 @@ def calculate_deviation(
             set_size = sets[v]
             non_contained_product *= 1 - set_size / total_items
 
-    dev = (intersection_size / total_items) - (contained_product * non_contained_product)
+    dev = (intersection_size / total_items) - (
+        contained_product * non_contained_product
+    )
 
     return dev * 100
 
@@ -276,7 +265,7 @@ def get_element_name_from_id(id):
     if len(elements) == 1:
         # the empty subset is named "Unincluded"
         #   and does not need "Just" prepended
-        if (elements[0] == "Unincluded"):
+        if elements[0] == "Unincluded":
             return "Unincluded"
         return f"Just {elements[0]}"
 
@@ -311,7 +300,7 @@ def generate_intersection_id(intersections, idx):
         intersection_id += f"~_~{name}" if set_membership[name] == "Yes" else ""
 
     # the empty subset is named "Subset_Unincluded" in UpSet2
-    if (intersection_id == "Subset"):
+    if intersection_id == "Subset":
         intersection_id += "~_~Unincluded"
 
     return intersection_id
@@ -324,17 +313,19 @@ def generate_processed_data(df, intersections, totals, accessible=False):
     for i in range(len(intersections)):
         id = generate_intersection_id(intersections, i)
         set_membership = get_set_membership_from_index(intersections, i)
-        contained_sets = [name for name, membership in set_membership.items() if membership == "Yes"]
+        contained_sets = [
+            name for name, membership in set_membership.items() if membership == "Yes"
+        ]
 
         intersection_size = int(intersections.iat[i])
 
         deviation = calculate_deviation(
-                contained_sets=contained_sets,
-                v_sets=list(totals.index),
-                sets=totals,
-                intersection_size=intersection_size,
-                total_items=totals.sum(),
-            )
+            contained_sets=contained_sets,
+            v_sets=list(totals.index),
+            sets=totals,
+            intersection_size=intersection_size,
+            total_items=totals.sum(),
+        )
 
         processedData["values"][id] = {
             "id": id,
@@ -367,7 +358,7 @@ def fetch_alt_text(grammar):
         parsed_data = parser.get_data()
         parsed_grammar = parser.get_grammar()
 
-        tokenmap: TokenMap = TokenMap(parsed_data, parsed_grammar, 'title')
+        tokenmap: TokenMap = TokenMap(parsed_data, parsed_grammar, "title")
 
         gen = AltTxtGen(Level.DEFAULT, True, tokenmap, parsed_grammar)
     except Exception as e:

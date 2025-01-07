@@ -1,5 +1,6 @@
 import pytest
-from upsetplot import generate_grammar, fetch_alt_text, generate_counts, UpSet
+
+from upsetplot import UpSet, fetch_alt_text, generate_counts, generate_grammar
 
 
 @pytest.fixture

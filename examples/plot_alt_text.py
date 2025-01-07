@@ -11,8 +11,8 @@ The generated text description can be accessed after creating the UpSet plot obj
 """
 
 from matplotlib import pyplot as plt
-from upsetplot import generate_counts
-from upsetplot import UpSet
+
+from upsetplot import UpSet, generate_counts
 
 # Load the dataset into a DataFrame
 example = generate_counts()
@@ -32,25 +32,25 @@ upset.plot()
 plt.suptitle("UpSet plot with text description generated'")
 text_description = upset.get_alt_text()
 
-print('==================================')
-print('Long Description (markdown formatted)')
-print('==================================')
-print(text_description['longDescription'])
+print("==================================")
+print("Long Description (markdown formatted)")
+print("==================================")
+print(text_description["longDescription"])
 
-print('==================================')
-print('Short Description')
-print('==================================')
-print(text_description['shortDescription'])
+print("==================================")
+print("Short Description")
+print("==================================")
+print(text_description["shortDescription"])
 
-print('\n==================================')
-print('Technique Description')
-print('==================================')
-print(text_description['techniqueDescription'])
+print("\n==================================")
+print("Technique Description")
+print("==================================")
+print(text_description["techniqueDescription"])
 
 plt.show()
 
 
-print('\nNow to generate the same plot with no alt text generation')
+print("\nNow to generate the same plot with no alt text generation")
 
 # To disable grammar generation, simply ignore the gen_grammar parameter or set it to False.
 upset = UpSet(
@@ -67,6 +67,6 @@ plt.suptitle("UpSet plot with no alt text generation")
 try:
     text_description = upset.get_alt_text()
 except ValueError:
-    print('gen_grammar must be set to True for any alt text generation.')
+    print("gen_grammar must be set to True for any alt text generation.")
 
 plt.show()
